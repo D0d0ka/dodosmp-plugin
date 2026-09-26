@@ -8,7 +8,6 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,49 +19,45 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Lisab vodka pruulimisretsepti ilma custom Potion registry entryta.
- * Vesi + nisu → vodka (PotionContents komponendiga), kliendid ei vaja moди.
+ * Vodka pruulimisretsept ilma custom Potion registry entryta (vanilla kliendid saavad liituda).
+ * OLULINE: hasMix(potion, ingredient) aga mix(ingredient, potion) — Minecraft API ebakõla!
  */
 @Mixin(net.minecraft.world.item.alchemy.PotionBrewing.class)
 public class PotionBrewingMixin {
 
-    /** Teeb nisu kehtivaks pruulimiskoostisosaks, kui vodka on lubatud. */
     @Inject(method = "isIngredient", at = @At("HEAD"), cancellable = true)
-    private void dodoIsIngredient(ItemStack stack,
-                                  CallbackInfoReturnable<Boolean> cir) {
+    private void dodoIsIngredient(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         if (stack.is(Items.WHEAT) && DodoConfig.getInstance().isEnabled("vodka")) {
             cir.setReturnValue(true);
         }
     }
 
-    /** Tunneb ära vesi + nisu kombinatsiooni pruulimiseks. */
+    // isBrewable kutsub: hasMix(potionSlotItem, ingredientSlotItem) — potion on arg[0]!
     @Inject(method = "hasMix", at = @At("HEAD"), cancellable = true)
-    private void dodoHasMix(ItemStack ingredient, ItemStack input,
+    private void dodoHasMix(ItemStack potionArg, ItemStack ingredientArg,
                              CallbackInfoReturnable<Boolean> cir) {
-        if (isVodkaMix(ingredient, input)) {
+        if (isVodkaMix(ingredientArg, potionArg)) {
             cir.setReturnValue(true);
         }
     }
 
-    /** Loob vodka ItemStack-i PotionContents komponendiga (ilma registry entryta). */
+    // doBrew kutsub: mix(ingredientSlotItem, potionSlotItem) — ingredient on arg[0]!
     @Inject(method = "mix", at = @At("HEAD"), cancellable = true)
-    private void dodoMix(ItemStack ingredient, ItemStack input,
-                          CallbackInfoReturnable<ItemStack> cir) {
-        if (isVodkaMix(ingredient, input)) {
-            cir.setReturnValue(buildVodkaStack(input.getItem()));
+    private void dodoMix(ItemStack ingredientArg, ItemStack potionArg,
+                         CallbackInfoReturnable<ItemStack> cir) {
+        if (isVodkaMix(ingredientArg, potionArg)) {
+            cir.setReturnValue(buildVodkaStack(potionArg.getItem()));
         }
     }
 
-    private static boolean isVodkaMix(ItemStack ingredient, ItemStack input) {
+    private static boolean isVodkaMix(ItemStack ingredient, ItemStack potion) {
         if (!ingredient.is(Items.WHEAT)) return false;
         if (!DodoConfig.getInstance().isEnabled("vodka")) return false;
-        if (!input.is(Items.POTION)) return false;
-        // Kontrollime, et tegemist on veepudeliga (mitte mõne muu potioniga)
-        PotionContents contents = input.get(DataComponents.POTION_CONTENTS);
+        if (!potion.is(Items.POTION)) return false;
+        PotionContents contents = potion.get(DataComponents.POTION_CONTENTS);
         return contents != null && contents.is(Potions.WATER);
     }
 
-    /** Vodka = Items.POTION + iivelduse efekt, custom nimi, ilma registreeritud Potion-ita. */
     private static ItemStack buildVodkaStack(Item potionItem) {
         PotionContents contents = new PotionContents(
                 Optional.empty(),
