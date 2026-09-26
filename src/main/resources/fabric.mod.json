@@ -2,32 +2,22 @@
 	"schemaVersion": 1,
 	"id": "dodosmp-plugin",
 	"version": "${version}",
-	"name": "dodosmp plugin",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "DodoSMP Plugin",
+	"description": "Server-side SMP plugin: Vodka potion, Cheaper Golden Apple, Craftable God Apple.",
 	"authors": [
-		"Me!"
+		"dodo"
 	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
+	"contact": {},
 	"license": "CC0-1.0",
 	"icon": "assets/dodosmp-plugin/icon.png",
-	"environment": "*",
+	"environment": "server",
 	"entrypoints": {
 		"main": [
 			"dodo.dodosmpplugin.DodosmpPlugin"
-		],
-		"client": [
-			"dodo.dodosmpplugin.client.DodosmpPluginClient"
 		]
 	},
 	"mixins": [
-		"dodosmp-plugin.mixins.json",
-		{
-			"config": "dodosmp-plugin.client.mixins.json",
-			"environment": "client"
-		}
+		"dodosmp-plugin.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.19.5",
