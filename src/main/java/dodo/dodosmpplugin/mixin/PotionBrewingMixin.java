@@ -61,7 +61,7 @@ public class PotionBrewingMixin {
     private static ItemStack buildVodkaStack(Item potionItem) {
         PotionContents contents = new PotionContents(
                 Optional.empty(),
-                Optional.empty(),
+                Optional.of(0xFFFFFF), // valge värvus
                 List.of(new MobEffectInstance(MobEffects.NAUSEA, 1200, 0)),
                 Optional.empty()
         );

@@ -25,8 +25,8 @@ public class DodoConfig {
 
     private static DodoConfig instance;
 
-    // feature_id -> lubatud/keelatud
     private Map<String, Boolean> features = new LinkedHashMap<>();
+    private Map<String, Boolean> settings = new LinkedHashMap<>();
 
     /** Tagastab singleton-instants, laadib vajadusel failist. */
     public static DodoConfig getInstance() {
@@ -51,6 +51,18 @@ public class DodoConfig {
         return Collections.unmodifiableMap(features);
     }
 
+    public boolean getSetting(String key, boolean defaultValue) {
+        return settings.getOrDefault(key, defaultValue);
+    }
+
+    public void setSetting(String key, boolean value) {
+        settings.put(key, value);
+    }
+
+    public Map<String, Boolean> getSettings() {
+        return Collections.unmodifiableMap(settings);
+    }
+
     /** Loab või loob config faili. */
     public static DodoConfig load() {
         if (Files.exists(CONFIG_PATH)) {
@@ -58,6 +70,7 @@ public class DodoConfig {
                 DodoConfig loaded = GSON.fromJson(reader, DodoConfig.class);
                 if (loaded != null) {
                     if (loaded.features == null) loaded.features = new LinkedHashMap<>();
+                    if (loaded.settings == null) loaded.settings = new LinkedHashMap<>();
                     instance = loaded;
                     return loaded;
                 }
