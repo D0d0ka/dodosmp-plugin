@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "dodosmp-plugin",
+	"version": "${version}",
+	"name": "dodosmp plugin",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/dodosmp-plugin/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dodo.dodosmpplugin.DodosmpPlugin"
+		],
+		"client": [
+			"dodo.dodosmpplugin.client.DodosmpPluginClient"
+		]
+	},
+	"mixins": [
+		"dodosmp-plugin.mixins.json",
+		{
+			"config": "dodosmp-plugin.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
