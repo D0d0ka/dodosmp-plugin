@@ -61,8 +61,14 @@ public class RecipeManagerMixin {
 
     /** Kontrollib, kas retsept peaks laadituks jääma vastavalt config'ile. */
     private static boolean shouldKeepRecipe(Identifier id, DodoConfig config) {
+        if (id.getNamespace().equals("minecraft")
+                && id.getPath().equals("golden_apple")
+                && config.isEnabled("cheaper_golden_apple")) {
+            return false;
+        }
+
         if (!DodosmpPlugin.MOD_ID.equals(id.getNamespace())) {
-            return true; // vanilla retseptid jäävad alati
+            return true;
         }
         return switch (id.getPath()) {
             case "cheaper_golden_apple" -> config.isEnabled("cheaper_golden_apple");
